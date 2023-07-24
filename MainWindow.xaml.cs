@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace WpfApp2
 {
@@ -36,7 +37,18 @@ namespace WpfApp2
             if (textBoxProcess.Text == "calculator.exe")
             {
                 Setup();
-                textBoxXml.Text = session.PageSource;
+                String str = session.PageSource.ToString();
+                String newStr = "";
+                for(int i = 0; i < str.Length; i++)
+                {
+                    newStr += str[i];
+                    if(str[i] == '>')
+                    {
+                        newStr += '\n';
+                        newStr += "    ";
+                    }
+                }
+                textBoxXml.Text = newStr;
                 TearDown();
             }
         }
