@@ -2,16 +2,19 @@
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using System;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 
 namespace WpfApp2
 {
-    public class ViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase
     {
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
         private const string CalculatorAppId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
 
         private WindowsDriver<WindowsElement> session;
+
 
         private string processText;
         public string ProcessText
@@ -21,6 +24,17 @@ namespace WpfApp2
             {
                 processText = value;
                 OnPropertyChanged(nameof(ProcessText));
+            }
+        }
+
+        private string searchText;
+        public string SearchText
+        {
+            get { return searchText; }
+            set
+            {
+                searchText = value;
+                OnPropertyChanged(nameof(SearchText));
             }
         }
 
@@ -48,23 +62,50 @@ namespace WpfApp2
             }
         }
 
+        private ICommand searchCommand;
+        public ICommand SearchCommand
+        {
+            get
+            {
+                if (searchCommand == null)
+                {
+                    searchCommand = new RelayCommand(Search);
+                }
+                return searchCommand;
+            }
+        }
+
+        private void Search()
+        {
+            String str = xmlText;
+
+            
+        }
+
         public void Start()
         {
             if (ProcessText == "calculator.exe")
             {
-                Setup();
-                string str = session.PageSource.ToString();
-                string newStr = "";
-                for (int i = 0; i < str.Length; i++)
+                try
                 {
-                    newStr += str[i];
-                    if (str[i] == '>')
+                    Setup();
+                    string str = session.PageSource.ToString();
+                    string newStr = "";
+                    for (int i = 0; i < str.Length; i++)
                     {
-                        newStr += '\n';
-                        newStr += "    ";
+                        newStr += str[i];
+                        if (str[i] == '>')
+                        {
+                            newStr += '\n';
+                            newStr += "    ";
+                        }
                     }
+                    XmlText = newStr;
                 }
-                XmlText = newStr;
+                catch (OpenQA.Selenium.WebDriverException)
+                {
+                    MessageBox.Show("You should run WinAppDriver.exe");
+                }
                 TearDown();
             }
         }

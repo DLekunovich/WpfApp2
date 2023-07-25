@@ -13,12 +13,17 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBox x:Name="textBoxProcess" Grid.Column="0" Margin="10,0,101,0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding ProcessText, Mode=TwoWay}"/>
 
-        <TextBox x:Name="textBoxXml" Grid.Row="1" Grid.Column="0" Margin="10" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding XmlText, Mode=TwoWay}"/>
+        <TextBox x:Name="textBoxSearch" Grid.Row="1" Grid.Column="0" Margin="10,0,101,0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding SearchText, Mode=TwoWay}"/>
+
+        <Button Content="Search" Grid.Row="1" Grid.Column="1" Margin="10" Command="{Binding SearchCommand}" Width="80" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+
+        <TextBox x:Name="textBoxXml" Grid.Row="2" Grid.Column="0" Margin="10" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding XmlText, Mode=TwoWay}"/>
 
         <Button Content="Start" Grid.Row="0" Grid.Column="1" Margin="10" Command="{Binding StartCommand}" Width="80" HorizontalAlignment="Right" VerticalAlignment="Top"/>
     </Grid>
