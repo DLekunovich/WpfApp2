@@ -11,7 +11,8 @@ namespace WpfApp2
     public class MainWindowViewModel : ViewModelBase
     {
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
-        private const string CalculatorAppId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
+        //private const string CalculatorAppId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
+        private string appText = "";
 
         private WindowsDriver<WindowsElement> session;
 
@@ -84,38 +85,87 @@ namespace WpfApp2
 
         public void Start()
         {
-            if (ProcessText == "calculator.exe")
+            if (processText == "" || processText == null)
             {
-                try
-                {
-                    Setup();
-                    string str = session.PageSource.ToString();
-                    string newStr = "";
-                    for (int i = 0; i < str.Length; i++)
-                    {
-                        newStr += str[i];
-                        if (str[i] == '>')
-                        {
-                            newStr += '\n';
-                            newStr += "    ";
-                        }
-                    }
-                    XmlText = newStr;
-                }
-                catch (OpenQA.Selenium.WebDriverException)
-                {
-                    MessageBox.Show("You should run WinAppDriver.exe");
-                }
-                TearDown();
+                MessageBox.Show("Enter path to .exe file!");
+                return;
             }
+            else
+            {
+                appText = (processText
+                    .Substring(processText.LastIndexOf('\\'))).Substring(1, (processText
+                    .Substring(processText.LastIndexOf('\\'))).Length - 6);
+            }
+            
+            try
+            {
+                if (CreateSessionForAlreadyRunningApp(appText) == null)
+                {
+                    try
+                    {
+                        Setup(processText);
+                    }
+                    catch (OpenQA.Selenium.WebDriverException)
+                    {
+                        MessageBox.Show("Can't find such app");
+                        return;
+                    }
+            }
+                else
+                    session = CreateSessionForAlreadyRunningApp(appText);
+                string str = session.PageSource.ToString();
+                string newStr = "";
+                for (int i = 0; i < str.Length; i++)
+                {
+                    newStr += str[i];
+                    if (str[i] == '>')
+                    {
+                        newStr += '\n';
+                        newStr += "    ";
+                    }
+                }
+                XmlText = newStr;
+            }
+            catch (OpenQA.Selenium.WebDriverException)
+            {
+                MessageBox.Show("You should run WinAppDriver.exe");
+                return;
+            }
+
+            TearDown();
         }
 
-        private void Setup()
+        private static WindowsDriver<WindowsElement> CreateSessionForAlreadyRunningApp(string appText)
+        {
+            bool ses = false;
+            IntPtr appTopLevelWindowHandle = new IntPtr();
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                if (clsProcess.ProcessName.IndexOf(appText, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    clsProcess.MainWindowTitle.IndexOf(appText, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    appTopLevelWindowHandle = clsProcess.MainWindowHandle;
+                    ses = true;
+                    break;
+                }
+            }
+            if (ses)
+            {
+                var appTopLevelWindowHandleHex = appTopLevelWindowHandle.ToString("x"); //convert number to hex string
+                var appOptions = new AppiumOptions();
+                appOptions.AddAdditionalCapability("appTopLevelWindow", appTopLevelWindowHandleHex);
+                var appSession = new WindowsDriver<WindowsElement>(new Uri("http://127.0.0.1:4723"), appOptions);
+                return appSession;
+            }
+            return null;
+        }
+
+        private void Setup(String appText)
         {
             if (session == null)
             {
                 var appOptions = new AppiumOptions();
-                appOptions.AddAdditionalCapability("app", CalculatorAppId);
+                appOptions.AddAdditionalCapability("app", appText);
                 appOptions.AddAdditionalCapability("deviceName", "WindowsPC");
                 session = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appOptions);
             }
