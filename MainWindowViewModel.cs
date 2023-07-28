@@ -2,20 +2,56 @@
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace WpfApp2
 {
     public class MainWindowViewModel : ViewModelBase
     {
         private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
-        //private const string CalculatorAppId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
         private string appText = "";
 
         private WindowsDriver<WindowsElement> session;
 
+        private readonly IMainWindowActions mainWindowActions;
+
+        public MainWindowViewModel(IMainWindowActions mainWindowActions)
+        {
+            this.mainWindowActions = mainWindowActions;
+        }
+
+        private Int32 selectedItem;
+        public Int32 SelectedItem
+        {
+            get { return selectedItem; }
+            set
+            {
+                selectedItem = value;
+                OnPropertyChanged(nameof(SelectedItem));
+            }
+        }
+
+        private ObservableCollection<String> items;
+
+        public ObservableCollection<String> Items
+        {
+            get { return items; }
+            set
+            {
+                items = (ObservableCollection<string>)value;
+                OnPropertyChanged(nameof(Items));
+            }
+        }
+
+        
 
         private string processText;
         public string ProcessText
@@ -36,6 +72,17 @@ namespace WpfApp2
             {
                 searchText = value;
                 OnPropertyChanged(nameof(SearchText));
+            }
+        }
+
+        private string searchResults;
+        public string SearchResults
+        {
+            get { return searchResults; }
+            set
+            {
+                searchResults = value;
+                OnPropertyChanged(nameof(SearchResults));
             }
         }
 
@@ -63,6 +110,25 @@ namespace WpfApp2
             }
         }
 
+        private ICommand showCommand;
+        public ICommand ShowCommand
+        {
+            get
+            {
+                if (showCommand == null)
+                {
+                    showCommand = new RelayCommand(Show);
+                }
+                return showCommand;
+            }
+        }
+
+        private void Show()
+        {
+            mainWindowActions.ScrollToLine(selectedItem);
+        }
+
+
         private ICommand searchCommand;
         public ICommand SearchCommand
         {
@@ -78,13 +144,33 @@ namespace WpfApp2
 
         private void Search()
         {
-            String str = xmlText;
+            Items = new ObservableCollection<String>();
+            int j = 0;
+            var text = xmlText.Split('\n');
+            for(int i = 0; i < text.Length; i++)
+            {
+                j = 0;
+                if (text.ElementAt(i).Contains(searchText))
+                {
+                    while(text.ElementAt(i).ElementAt(j).ToString() != ".")
+                    {
+                        SearchResults += text.ElementAt(i).ElementAt(j);
+                        j++;
+                    }
 
+                    Items.Add(SearchResults);
+                }
+                SearchResults = "";
+            }
             
         }
 
-        public void Start()
+
+        private void Start()
         {
+
+            int counter = 2;
+
             if (processText == "" || processText == null)
             {
                 MessageBox.Show("Enter path to .exe file!");
@@ -114,14 +200,15 @@ namespace WpfApp2
                 else
                     session = CreateSessionForAlreadyRunningApp(appText);
                 string str = session.PageSource.ToString();
-                string newStr = "";
+                string newStr = "1.";
                 for (int i = 0; i < str.Length; i++)
                 {
                     newStr += str[i];
-                    if (str[i] == '>')
+                    if (str[i] == '>' && i != str.Length - 1)
                     {
                         newStr += '\n';
-                        newStr += "    ";
+                        newStr += counter + ".    ";
+                        counter++;
                     }
                 }
                 XmlText = newStr;
