@@ -8,38 +8,70 @@
         Title="MainWindow" SizeToContent="WidthAndHeight" MinWidth="400" MinHeight="300" MaxWidth="1200" MaxHeight="800">
 
 
+	<TabControl>
+		<TabItem Header="Start">
 
-    <Grid Margin="0,0,0,8">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" MinHeight="36" />
-            <RowDefinition />
-            <RowDefinition Height="Auto" MinHeight="30.04" />
-        </Grid.RowDefinitions>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition />
+					<ColumnDefinition Width="100" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="39.787"/>
+					<RowDefinition Height="Auto" MinHeight="36" />
+					<RowDefinition Height ="*"/>
+					<RowDefinition Height="40" MinHeight="30.04" />
+				</Grid.RowDefinitions>
+
+				<TextBox x:Name="textBoxProcess" Grid.Row="0"  Grid.Column="0" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding ProcessText, Mode=TwoWay}"/>				
+
+				<TextBox x:Name="textBoxSearch" Grid.Row="1" Grid.Column="0" Margin="10,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding SearchText, Mode=TwoWay}"/>
+
+				<Button Content="Search" Grid.Row="1" Grid.Column="1" Margin="10,0,10,0" Command="{Binding SearchCommand}" Width="80" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+				<TextBox x:Name="textBoxXml" Grid.Row="2" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Visible" Margin="10,10,10,10" TextWrapping="Wrap" Text="{Binding XmlText, Mode=TwoWay}"/>
+
+				<Button Content="Start" Grid.Row="0" Grid.Column="1" Margin="10,0,10,0" Command="{Binding StartCommand}" Width="80" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+				<ListView x:Name="listViewSearchResults" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding Items, Mode=TwoWay}"  SelectedItem="{Binding SelectedItem}" Height="20" MinWidth="200">
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding}" />
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+
+				<Button x:Name="buttonShow" Grid.Row="3" Grid.Column="1" Content="Show" Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Command="{Binding ShowCommand}" Width="40"/>
+			</Grid>
+
+		</TabItem>
+		<TabItem Header="Konfiguracja">
+
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="35"/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="39.787"/>
+					<RowDefinition Height="39.787"/>
+					<RowDefinition Height="Auto"/>
+				</Grid.RowDefinitions>
+
+				<Label x:Name="label1" Content="Path" VerticalAlignment="Center"/>
+
+				<TextBox x:Name="textBoxPath" Grid.Row="0" Grid.Column="1" Margin="10" VerticalAlignment="Center" Text="{Binding ProcessText, Mode=TwoWay}"/>
 
 
-        <TextBox x:Name="textBoxProcess" Grid.Column="0" Margin="10,0,101,0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding ProcessText, Mode=TwoWay}"/>
+				<Label x:Name="label2" Grid.Row="1" Content="Url" VerticalAlignment="Center"/>
 
-        <TextBox x:Name="textBoxSearch" Grid.Row="1" Grid.Column="0" Margin="10,0,101,0" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding SearchText, Mode=TwoWay}"/>
+				<TextBox x:Name="textBoxUrl" Grid.Row="1" Grid.Column="1" Margin="10" VerticalAlignment="Center" Text="{Binding UrlText, Mode=TwoWay}" />
 
-        <Button Content="Search" Grid.Row="1" Grid.Column="1" Margin="10" Command="{Binding SearchCommand}" Width="80" HorizontalAlignment="Right" VerticalAlignment="Top"/>
 
-        <TextBox x:Name="textBoxXml" Grid.Row="2" Grid.Column="0" VerticalScrollBarVisibility="Visible" Margin="10" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Text="{Binding XmlText, Mode=TwoWay}"/>
+			</Grid>
 
-        <Button Content="Start" Grid.Row="0" Grid.Column="1" Margin="10" Command="{Binding StartCommand}" Width="80" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+		</TabItem>
+	</TabControl>
 
-        <ListView x:Name="listViewSearchResults" Grid.Row="3" Grid.Column="0" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Left" ItemsSource="{Binding Items, Mode=TwoWay}" Height="30" Width="50" SelectedItem="{Binding SelectedItem}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Button Command="{Binding DataContext.ShowCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}">
-                        <TextBlock Text="{Binding}" />
-                    </Button>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
 
-    </Grid>
 </Window>

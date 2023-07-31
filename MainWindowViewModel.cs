@@ -16,7 +16,7 @@ namespace WpfApp2
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
+        //private const string WindowsApplicationDriverUrl = "http://127.0.0.1:4723";
         private string appText = "";
 
         private WindowsDriver<WindowsElement> session;
@@ -51,7 +51,16 @@ namespace WpfApp2
             }
         }
 
-        
+        private string urlText = "http://127.0.0.1:4723";
+        public string UrlText
+        {
+            get { return urlText; }
+            set
+            {
+                urlText = value;
+                OnPropertyChanged(nameof(UrlText));
+            }
+        }
 
         private string processText;
         public string ProcessText
@@ -185,11 +194,11 @@ namespace WpfApp2
             
             try
             {
-                if (CreateSessionForAlreadyRunningApp(appText) == null)
+                if (CreateSessionForAlreadyRunningApp(this, appText) == null)
                 {
                     try
                     {
-                        Setup(processText);
+                        Setup(this, processText);
                     }
                     catch (OpenQA.Selenium.WebDriverException)
                     {
@@ -198,7 +207,7 @@ namespace WpfApp2
                     }
             }
                 else
-                    session = CreateSessionForAlreadyRunningApp(appText);
+                    session = CreateSessionForAlreadyRunningApp(this, appText);
                 string str = session.PageSource.ToString();
                 string newStr = "1.";
                 for (int i = 0; i < str.Length; i++)
@@ -222,7 +231,7 @@ namespace WpfApp2
             TearDown();
         }
 
-        private static WindowsDriver<WindowsElement> CreateSessionForAlreadyRunningApp(string appText)
+        private static WindowsDriver<WindowsElement> CreateSessionForAlreadyRunningApp(MainWindowViewModel viewModel, string appText)
         {
             bool ses = false;
             IntPtr appTopLevelWindowHandle = new IntPtr();
@@ -241,20 +250,20 @@ namespace WpfApp2
                 var appTopLevelWindowHandleHex = appTopLevelWindowHandle.ToString("x"); //convert number to hex string
                 var appOptions = new AppiumOptions();
                 appOptions.AddAdditionalCapability("appTopLevelWindow", appTopLevelWindowHandleHex);
-                var appSession = new WindowsDriver<WindowsElement>(new Uri("http://127.0.0.1:4723"), appOptions);
+                var appSession = new WindowsDriver<WindowsElement>(new Uri(viewModel.UrlText), appOptions);
                 return appSession;
             }
             return null;
         }
 
-        private void Setup(String appText)
+        private void Setup(MainWindowViewModel viewModel, String appText)
         {
             if (session == null)
             {
                 var appOptions = new AppiumOptions();
                 appOptions.AddAdditionalCapability("app", appText);
                 appOptions.AddAdditionalCapability("deviceName", "WindowsPC");
-                session = new WindowsDriver<WindowsElement>(new Uri(WindowsApplicationDriverUrl), appOptions);
+                session = new WindowsDriver<WindowsElement>(new Uri(viewModel.UrlText), appOptions);
             }
         }
 
